@@ -8,14 +8,30 @@ public class PaymentRequest {
     private UUID userId;
     private double amount;
 
-    public PaymentRequest() {}
+    public PaymentRequest() {
+    }
 
-    public UUID getBookingId() { return bookingId; }
-    public void setBookingId(UUID bookingId) { this.bookingId = bookingId; }
+    public UUID getBookingId() {
+        return bookingId;
+    }
 
-    public UUID getUserId() { return userId; }
-    public void setUserId(UUID userId) { this.userId = userId; }
+    public void setBookingId(UUID bookingId) {
+        this.bookingId = bookingId;
+    }
 
-    public double getAmount() { return amount; }
-    public void setAmount(double amount) { this.amount = amount; }
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
 }
