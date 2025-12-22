@@ -2,13 +2,13 @@ package org.yeditepe.eventhandler.dto;
 
 import java.util.UUID;
 
-public class CreateBookingRequest {
+public class BookingRequest {
 
     private UUID userId;
     private UUID eventId;
     private int ticketCount;
 
-    public CreateBookingRequest() {
+    public BookingRequest() {
     }
 
     public UUID getUserId() {
