@@ -2,6 +2,5 @@ server:
   port: 8081
 
 spring:
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/eventdb
+  mongodb:
+    uri: mongodb://localhost:27017/eventdb
