@@ -16,6 +16,7 @@ public class Event {
     @Id
     private String id;
 
+
     private String title;
     private String category;
     private String description;
