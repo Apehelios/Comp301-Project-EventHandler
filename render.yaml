@@ -1,60 +1,44 @@
 services:
   - type: web
     name: user-service
-    env: java
+    runtime: docker
     plan: free
     region: frankfurt
-    branch: main
-    rootDir: user-service
-    buildCommand: ./mvnw clean package
-    startCommand: java -jar target/*.jar
+    dockerContext: user-service
+    dockerfilePath: user-service/Dockerfile
     envVars:
-      - key: JAVA_VERSION
-        value: 17
-      - key: PORT
-        value: 8083
+      - key: SPRING_PROFILES_ACTIVE
+        value: production
 
   - type: web
     name: event-catalog-service
-    env: java
+    runtime: docker
     plan: free
     region: frankfurt
-    branch: main
-    rootDir: event-catalog-service
-    buildCommand: ./mvnw clean package
-    startCommand: java -jar target/*.jar
+    dockerContext: event-catalog-service
+    dockerfilePath: event-catalog-service/Dockerfile
     envVars:
-      - key: JAVA_VERSION
-        value: 17
-      - key: PORT
-        value: 8084
+      - key: SPRING_PROFILES_ACTIVE
+        value: production
 
   - type: web
     name: booking-service
-    env: java
+    runtime: docker
     plan: free
     region: frankfurt
-    branch: main
-    rootDir: booking-service
-    buildCommand: ./mvnw clean package
-    startCommand: java -jar target/*.jar
+    dockerContext: booking-service
+    dockerfilePath: booking-service/Dockerfile
     envVars:
-      - key: JAVA_VERSION
-        value: 17
-      - key: PORT
-        value: 8081
+      - key: SPRING_PROFILES_ACTIVE
+        value: production
 
   - type: web
     name: payment-service
-    env: java
+    runtime: docker
     plan: free
     region: frankfurt
-    branch: main
-    rootDir: payment-service
-    buildCommand: ./mvnw clean package
-    startCommand: java -jar target/*.jar
+    dockerContext: payment-service
+    dockerfilePath: payment-service/Dockerfile
     envVars:
-      - key: JAVA_VERSION
-        value: 17
-      - key: PORT
-        value: 8082
+      - key: SPRING_PROFILES_ACTIVE
+        value: production

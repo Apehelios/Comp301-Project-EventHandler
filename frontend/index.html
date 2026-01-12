@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>EventHandler Demo</title>
+    <title>EventHandler Microservices Demo</title>
 
     <style>
         body { font-family: Arial, sans-serif; margin: 24px; }
@@ -18,39 +18,40 @@
 </head>
 <body>
 
-<h1>EventHandler Microservices Demo</h1>
+<h1>EventHandler – Microservices Demo</h1>
 <p class="small">
-    user-service • event-catalog-service • booking-service • payment-service
+    User • Event • Booking • Payment services (Render deployment)
 </p>
 
 <!-- SERVICE URLS -->
 <div class="card" style="width:100%;max-width:760px">
-    <h3>Service URLs</h3>
+    <h3>Service Base URLs</h3>
+    <p class="small">Paste Render service URLs (no ports)</p>
     <div class="row">
         <div style="flex:1">
             <label>User Service</label>
-            <input id="userBase" value="http://localhost:8083" />
+            <input id="userBase" placeholder="https://user-service.onrender.com"/>
         </div>
         <div style="flex:1">
             <label>Event Service</label>
-            <input id="eventBase" value="http://localhost:8084" />
+            <input id="eventBase" placeholder="https://event-catalog-service.onrender.com"/>
         </div>
     </div>
     <div class="row">
         <div style="flex:1">
             <label>Booking Service</label>
-            <input id="bookingBase" value="http://localhost:8081" />
+            <input id="bookingBase" placeholder="https://booking-service.onrender.com"/>
         </div>
         <div style="flex:1">
             <label>Payment Service</label>
-            <input id="paymentBase" value="http://localhost:8082" />
+            <input id="paymentBase" placeholder="https://payment-service.onrender.com"/>
         </div>
     </div>
 </div>
 
 <div class="row" style="margin-top:16px">
 
-    <!-- USER CARD -->
+    <!-- USER -->
     <div class="card">
         <h3>1) Register User</h3>
         <input id="fullName" placeholder="Full name" value="User One"/>
@@ -61,15 +62,7 @@
 
         <hr/>
 
-        <h3>2) Login (optional)</h3>
-        <input id="loginEmail" value="user1@test.com"/>
-        <input id="loginPassword" value="1234"/>
-        <button onclick="loginUser()">Login</button>
-        <pre id="loginOut">{}</pre>
-
-        <hr/>
-
-        <h3>3) Users List</h3>
+        <h3>2) Users List</h3>
         <button onclick="listUsers()">Refresh Users</button>
         <label>Select User</label>
         <select id="userSelect" onchange="onUserSelectChange()"></select>
@@ -77,15 +70,15 @@
 
         <hr/>
 
-        <h3>4) Deposit Balance</h3>
+        <h3>3) Deposit Balance</h3>
         <input id="depositAmount" type="number" value="500"/>
-        <button onclick="deposit()">Deposit to Selected User</button>
+        <button onclick="deposit()">Deposit</button>
         <pre id="depositOut">{}</pre>
     </div>
 
-    <!-- EVENT CARD -->
+    <!-- EVENT -->
     <div class="card">
-        <h3>5) Create Event</h3>
+        <h3>4) Create Event</h3>
         <input id="eventTitle" value="Rock Concert"/>
         <textarea id="eventDesc">Live concert demo</textarea>
         <input id="eventLocation" value="Istanbul"/>
@@ -97,7 +90,7 @@
 
         <hr/>
 
-        <h3>6) Events List</h3>
+        <h3>5) Events List</h3>
         <button onclick="listEvents()">Refresh Events</button>
         <label>Select Event</label>
         <select id="eventSelect" onchange="onEventSelectChange()"></select>
@@ -106,14 +99,14 @@
 
     <!-- BOOKING + PAYMENT -->
     <div class="card">
-        <h3>7) Create Booking</h3>
+        <h3>6) Booking</h3>
         <input id="seatCount" type="number" value="2"/>
-        <button onclick="createBooking()">Book Ticket</button>
+        <button onclick="createBooking()">Create Booking</button>
         <pre id="bookingCreateOut">{}</pre>
 
         <hr/>
 
-        <h3>8) Payment</h3>
+        <h3>7) Payment</h3>
         <button onclick="createPayment()">Pay</button>
         <pre id="paymentCreateOut">{}</pre>
     </div>
@@ -156,7 +149,7 @@
         return arr.find(x => x.id === id);
     }
 
-    /* USER */
+    /* USERS */
     async function registerUser() {
         const data = await api("POST", base("userBase") + "/api/users/register", {
             fullName: fullName.value,
@@ -167,18 +160,9 @@
         listUsers();
     }
 
-    async function loginUser() {
-        const data = await api("POST", base("userBase") + "/api/users/login", {
-            email: loginEmail.value,
-            password: loginPassword.value
-        });
-        loginOut.textContent = JSON.stringify(data, null, 2);
-        listUsers();
-    }
-
     async function listUsers() {
         users = await api("GET", base("userBase") + "/api/users");
-        setSelect("userSelect", users, u => `${u.fullName} (${u.balance})`);
+        setSelect("userSelect", users, u => `${u.fullName} (₺${u.balance})`);
         selectedUserId = userSelect.value;
         selectedUserOut.textContent = JSON.stringify(find(users, selectedUserId), null, 2);
     }
@@ -197,7 +181,7 @@
         listUsers();
     }
 
-    /* EVENT */
+    /* EVENTS */
     async function createEvent() {
         const data = await api("POST", base("eventBase") + "/api/events", {
             title: eventTitle.value,
@@ -214,7 +198,7 @@
 
     async function listEvents() {
         events = await api("GET", base("eventBase") + "/api/events");
-        setSelect("eventSelect", events, e => `${e.title} (${e.price})`);
+        setSelect("eventSelect", events, e => `${e.title} (₺${e.price})`);
         selectedEventId = eventSelect.value;
         selectedEventOut.textContent = JSON.stringify(find(events, selectedEventId), null, 2);
     }
