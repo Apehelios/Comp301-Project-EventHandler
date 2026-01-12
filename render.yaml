@@ -1,0 +1,60 @@
+services:
+  - type: web
+    name: user-service
+    env: java
+    plan: free
+    region: frankfurt
+    branch: main
+    rootDir: user-service
+    buildCommand: ./mvnw clean package
+    startCommand: java -jar target/*.jar
+    envVars:
+      - key: JAVA_VERSION
+        value: 17
+      - key: PORT
+        value: 8083
+
+  - type: web
+    name: event-catalog-service
+    env: java
+    plan: free
+    region: frankfurt
+    branch: main
+    rootDir: event-catalog-service
+    buildCommand: ./mvnw clean package
+    startCommand: java -jar target/*.jar
+    envVars:
+      - key: JAVA_VERSION
+        value: 17
+      - key: PORT
+        value: 8084
+
+  - type: web
+    name: booking-service
+    env: java
+    plan: free
+    region: frankfurt
+    branch: main
+    rootDir: booking-service
+    buildCommand: ./mvnw clean package
+    startCommand: java -jar target/*.jar
+    envVars:
+      - key: JAVA_VERSION
+        value: 17
+      - key: PORT
+        value: 8081
+
+  - type: web
+    name: payment-service
+    env: java
+    plan: free
+    region: frankfurt
+    branch: main
+    rootDir: payment-service
+    buildCommand: ./mvnw clean package
+    startCommand: java -jar target/*.jar
+    envVars:
+      - key: JAVA_VERSION
+        value: 17
+      - key: PORT
+        value: 8082
