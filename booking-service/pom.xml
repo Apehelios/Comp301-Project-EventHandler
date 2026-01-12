@@ -9,6 +9,7 @@
         <groupId>org.yeditepe</groupId>
         <artifactId>eventhandler</artifactId>
         <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>booking-service</artifactId>

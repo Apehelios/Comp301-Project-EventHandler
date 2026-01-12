@@ -4,10 +4,22 @@
                              https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- ✅ Spring Boot manages dependency versions -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.1</version>
+        <relativePath/>
+    </parent>
+
     <groupId>org.yeditepe</groupId>
     <artifactId>eventhandler</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
+
+    <properties>
+        <java.version>17</java.version>
+    </properties>
 
     <modules>
         <module>user-service</module>
@@ -16,15 +28,11 @@
         <module>payment-service</module>
     </modules>
 
-    <properties>
-        <java.version>17</java.version>
-    </properties>
-
     <build>
         <pluginManagement>
             <plugins>
 
-                <!-- ✅ Fix for Render: creates runnable Spring Boot jars -->
+                <!-- ✅ Makes jars runnable (fixes "no main manifest attribute") -->
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
@@ -37,7 +45,7 @@
                     </executions>
                 </plugin>
 
-                <!-- ✅ Optional (recommended) -->
+                <!-- ✅ Optional: keeps parameter names for Spring MVC -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
