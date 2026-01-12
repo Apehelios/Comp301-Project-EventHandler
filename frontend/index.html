@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>EventHandler Demo</title>
+
+    <style>
+        body { font-family: Arial, sans-serif; margin: 24px; }
+        h1 { margin-bottom: 8px; }
+        .row { display: flex; gap: 16px; flex-wrap: wrap; }
+        .card { border: 1px solid #ddd; border-radius: 10px; padding: 14px; width: 360px; }
+        input, textarea, select { width: 100%; padding: 8px; margin: 6px 0 10px; }
+        button { padding: 8px 10px; cursor: pointer; }
+        pre { background: #f7f7f7; padding: 10px; border-radius: 10px; overflow: auto; }
+        .small { color: #666; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<h1>EventHandler Microservices Demo</h1>
+<p class="small">
+    user-service • event-catalog-service • booking-service • payment-service
+</p>
+
+<!-- SERVICE URLS -->
+<div class="card" style="width:100%;max-width:760px">
+    <h3>Service URLs</h3>
+    <div class="row">
+        <div style="flex:1">
+            <label>User Service</label>
+            <input id="userBase" value="http://localhost:8083" />
+        </div>
+        <div style="flex:1">
+            <label>Event Service</label>
+            <input id="eventBase" value="http://localhost:8084" />
+        </div>
+    </div>
+    <div class="row">
+        <div style="flex:1">
+            <label>Booking Service</label>
+            <input id="bookingBase" value="http://localhost:8081" />
+        </div>
+        <div style="flex:1">
+            <label>Payment Service</label>
+            <input id="paymentBase" value="http://localhost:8082" />
+        </div>
+    </div>
+</div>
+
+<div class="row" style="margin-top:16px">
+
+    <!-- USER CARD -->
+    <div class="card">
+        <h3>1) Register User</h3>
+        <input id="fullName" placeholder="Full name" value="User One"/>
+        <input id="email" placeholder="Email" value="user1@test.com"/>
+        <input id="password" placeholder="Password" value="1234"/>
+        <button onclick="registerUser()">Register</button>
+        <pre id="registerOut">{}</pre>
+
+        <hr/>
+
+        <h3>2) Login (optional)</h3>
+        <input id="loginEmail" value="user1@test.com"/>
+        <input id="loginPassword" value="1234"/>
+        <button onclick="loginUser()">Login</button>
+        <pre id="loginOut">{}</pre>
+
+        <hr/>
+
+        <h3>3) Users List</h3>
+        <button onclick="listUsers()">Refresh Users</button>
+        <label>Select User</label>
+        <select id="userSelect" onchange="onUserSelectChange()"></select>
+        <pre id="selectedUserOut">{}</pre>
+
+        <hr/>
+
+        <h3>4) Deposit Balance</h3>
+        <input id="depositAmount" type="number" value="500"/>
+        <button onclick="deposit()">Deposit to Selected User</button>
+        <pre id="depositOut">{}</pre>
+    </div>
+
+    <!-- EVENT CARD -->
+    <div class="card">
+        <h3>5) Create Event</h3>
+        <input id="eventTitle" value="Rock Concert"/>
+        <textarea id="eventDesc">Live concert demo</textarea>
+        <input id="eventLocation" value="Istanbul"/>
+        <input id="eventDateTime" value="2026-02-01T20:00:00"/>
+        <input id="eventPrice" type="number" value="250"/>
+        <input id="eventCapacity" type="number" value="100"/>
+        <button onclick="createEvent()">Create Event</button>
+        <pre id="eventCreateOut">{}</pre>
+
+        <hr/>
+
+        <h3>6) Events List</h3>
+        <button onclick="listEvents()">Refresh Events</button>
+        <label>Select Event</label>
+        <select id="eventSelect" onchange="onEventSelectChange()"></select>
+        <pre id="selectedEventOut">{}</pre>
+    </div>
+
+    <!-- BOOKING + PAYMENT -->
+    <div class="card">
+        <h3>7) Create Booking</h3>
+        <input id="seatCount" type="number" value="2"/>
+        <button onclick="createBooking()">Book Ticket</button>
+        <pre id="bookingCreateOut">{}</pre>
+
+        <hr/>
+
+        <h3>8) Payment</h3>
+        <button onclick="createPayment()">Pay</button>
+        <pre id="paymentCreateOut">{}</pre>
+    </div>
+
+</div>
+
+<script>
+    let users = [];
+    let events = [];
+    let selectedUserId = null;
+    let selectedEventId = null;
+    let currentBooking = null;
+
+    function base(id) {
+        return document.getElementById(id).value.trim();
+    }
+
+    async function api(method, url, body) {
+        const opt = { method, headers: { "Content-Type": "application/json" } };
+        if (body) opt.body = JSON.stringify(body);
+        const res = await fetch(url, opt);
+        const txt = await res.text();
+        const data = txt ? JSON.parse(txt) : {};
+        if (!res.ok) throw new Error(JSON.stringify(data));
+        return data;
+    }
+
+    function setSelect(id, list, labelFn) {
+        const s = document.getElementById(id);
+        s.innerHTML = "";
+        list.forEach(x => {
+            const o = document.createElement("option");
+            o.value = x.id;
+            o.textContent = labelFn(x);
+            s.appendChild(o);
+        });
+    }
+
+    function find(arr, id) {
+        return arr.find(x => x.id === id);
+    }
+
+    /* USER */
+    async function registerUser() {
+        const data = await api("POST", base("userBase") + "/api/users/register", {
+            fullName: fullName.value,
+            email: email.value,
+            password: password.value
+        });
+        registerOut.textContent = JSON.stringify(data, null, 2);
+        listUsers();
+    }
+
+    async function loginUser() {
+        const data = await api("POST", base("userBase") + "/api/users/login", {
+            email: loginEmail.value,
+            password: loginPassword.value
+        });
+        loginOut.textContent = JSON.stringify(data, null, 2);
+        listUsers();
+    }
+
+    async function listUsers() {
+        users = await api("GET", base("userBase") + "/api/users");
+        setSelect("userSelect", users, u => `${u.fullName} (${u.balance})`);
+        selectedUserId = userSelect.value;
+        selectedUserOut.textContent = JSON.stringify(find(users, selectedUserId), null, 2);
+    }
+
+    function onUserSelectChange() {
+        selectedUserId = userSelect.value;
+        selectedUserOut.textContent = JSON.stringify(find(users, selectedUserId), null, 2);
+    }
+
+    async function deposit() {
+        const data = await api(
+            "POST",
+            `${base("userBase")}/api/users/${selectedUserId}/deposit?amount=${depositAmount.value}`
+        );
+        depositOut.textContent = JSON.stringify(data, null, 2);
+        listUsers();
+    }
+
+    /* EVENT */
+    async function createEvent() {
+        const data = await api("POST", base("eventBase") + "/api/events", {
+            title: eventTitle.value,
+            description: eventDesc.value,
+            location: eventLocation.value,
+            eventDateTime: eventDateTime.value,
+            price: Number(eventPrice.value),
+            capacity: Number(eventCapacity.value),
+            createdByUserId: selectedUserId
+        });
+        eventCreateOut.textContent = JSON.stringify(data, null, 2);
+        listEvents();
+    }
+
+    async function listEvents() {
+        events = await api("GET", base("eventBase") + "/api/events");
+        setSelect("eventSelect", events, e => `${e.title} (${e.price})`);
+        selectedEventId = eventSelect.value;
+        selectedEventOut.textContent = JSON.stringify(find(events, selectedEventId), null, 2);
+    }
+
+    function onEventSelectChange() {
+        selectedEventId = eventSelect.value;
+        selectedEventOut.textContent = JSON.stringify(find(events, selectedEventId), null, 2);
+    }
+
+    /* BOOKING */
+    async function createBooking() {
+        const data = await api("POST", base("bookingBase") + "/api/bookings", {
+            userId: selectedUserId,
+            eventId: selectedEventId,
+            seatCount: Number(seatCount.value)
+        });
+        currentBooking = data;
+        bookingCreateOut.textContent = JSON.stringify(data, null, 2);
+    }
+
+    /* PAYMENT */
+    async function createPayment() {
+        const ev = find(events, selectedEventId);
+        const amount = ev.price * Number(seatCount.value);
+        const data = await api("POST", base("paymentBase") + "/api/payments", {
+            bookingId: currentBooking.id,
+            amount
+        });
+        paymentCreateOut.textContent = JSON.stringify(data, null, 2);
+    }
+</script>
+
+</body>
+</html>
